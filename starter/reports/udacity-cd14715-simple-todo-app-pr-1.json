@@ -1,0 +1,382 @@
+{
+  "pullRequest": {
+    "owner": "udacity",
+    "repo": "cd14715-simple-todo-app",
+    "number": 1
+  },
+  "fileReviews": [
+    {
+      "file": "fixtures/clean-code.ts",
+      "codeQuality": {
+        "file": "fixtures/clean-code.ts",
+        "issues": [
+          {
+            "line": 34,
+            "severity": "medium",
+            "category": "security",
+            "description": "Email validation regex is overly permissive and may accept invalid email addresses. The pattern /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/ allows many technically invalid formats.",
+            "suggestion": "Use a more robust email validation library like 'validator.js' or implement RFC 5322 compliant validation. Consider: const validator = require('validator'); return validator.isEmail(email);"
+          },
+          {
+            "line": 42,
+            "severity": "medium",
+            "category": "security",
+            "description": "HTML entity sanitization is incomplete and may not prevent all XSS attacks. This basic approach doesn't handle all possible attack vectors (e.g., JavaScript event handlers, unicode bypasses).",
+            "suggestion": "Use a dedicated sanitization library like 'DOMPurify' or 'xss'. For backend use, consider libraries designed for server-side sanitization. Example: import createDOMPurify from 'isomorphic-dompurify'; return createDOMPurify.sanitize(input);"
+          },
+          {
+            "line": 42,
+            "severity": "low",
+            "category": "security",
+            "description": "Sanitization function doesn't handle backslashes (\\) which could be used in certain injection scenarios.",
+            "suggestion": "Add .replace(/\\\\/g, '\\\\\\\\') to escape backslashes, or use a comprehensive sanitization library."
+          },
+          {
+            "line": 67,
+            "severity": "medium",
+            "category": "maintainability",
+            "description": "Email is not validated after lowercasing. Edge cases with unicode or internationalized domain names could bypass validation.",
+            "suggestion": "Move email.toLowerCase() before validation: const normalizedEmail = input.email.toLowerCase(); if (!isValidEmail(normalizedEmail)) { ... }. Then use normalizedEmail throughout."
+          },
+          {
+            "line": 72,
+            "severity": "low",
+            "category": "bug-risk",
+            "description": "Email is sanitized after lowercasing but name is sanitized separately. This inconsistency could lead to bugs if sanitization logic needs to change.",
+            "suggestion": "Create a consistent input processing pipeline. Consider a single normalization function that handles both email and name."
+          },
+          {
+            "line": 80,
+            "severity": "low",
+            "category": "security",
+            "description": "ID generation uses Math.random() which is not cryptographically secure and may produce collisions in high-volume scenarios.",
+            "suggestion": "Use crypto.randomUUID() for Node.js 14.17+ or the 'uuid' package: import { v4 as uuidv4 } from 'uuid'; return uuidv4();"
+          },
+          {
+            "line": 80,
+            "severity": "info",
+            "category": "performance",
+            "description": "ID generation combines Date.now() with Math.random() which could theoretically produce collisions if called multiple times in the same millisecond.",
+            "suggestion": "Use crypto.randomUUID() or a battle-tested library like 'nanoid' or 'ulid' for guaranteed unique IDs."
+          },
+          {
+            "line": 56,
+            "severity": "low",
+            "category": "best-practice",
+            "description": "Error messages expose internal validation logic which could aid attackers in reconnaissance.",
+            "suggestion": "Use generic error messages for user-facing errors and log detailed information separately. Example: throw new Error('Invalid user input') while logging specific validation failures."
+          },
+          {
+            "line": 88,
+            "severity": "medium",
+            "category": "maintainability",
+            "description": "Database query is commented out, making this code non-functional in production. No actual database interaction or error handling is implemented.",
+            "suggestion": "Either implement actual database logic with proper error handling, connection management, and retry logic, or clearly mark this as a stub/mock for testing purposes."
+          },
+          {
+            "line": 86,
+            "severity": "low",
+            "category": "maintainability",
+            "description": "No error handling for database operations. If saveUser fails, the error will propagate without context.",
+            "suggestion": "Wrap database operations in try-catch with meaningful error messages: try { await saveUser(user); } catch (error) { throw new Error(`Failed to create user: ${error.message}`); }"
+          },
+          {
+            "line": 50,
+            "severity": "info",
+            "category": "best-practice",
+            "description": "Function lacks JSDoc for parameters and return type, which reduces IDE autocomplete helpfulness.",
+            "suggestion": "Add complete JSDoc: @param {CreateUserInput} input - The user data to create @returns {Promise<User>} The created user object @throws {Error} If validation fails"
+          },
+          {
+            "line": 66,
+            "severity": "info",
+            "category": "security",
+            "description": "No email normalization beyond lowercasing. Leading/trailing whitespace could cause duplicate accounts.",
+            "suggestion": "Add .trim() to email processing: email: input.email.trim().toLowerCase()"
+          },
+          {
+            "line": 64,
+            "severity": "info",
+            "category": "maintainability",
+            "description": "Name field has no length validation. Extremely long names could cause database or display issues.",
+            "suggestion": "Add length validation: if (input.name.length < 1 || input.name.length > 255) { throw new Error('Name must be between 1 and 255 characters'); }"
+          },
+          {
+            "line": 52,
+            "severity": "info",
+            "category": "maintainability",
+            "description": "Input validation checks for falsy values (!input.email) which would reject empty strings but the check could be more explicit.",
+            "suggestion": "Use explicit checks: if (!input.email?.trim() || !input.name?.trim()) to handle whitespace-only strings."
+          }
+        ],
+        "overallScore": 72,
+        "summary": "This code demonstrates good security awareness with parameterized queries, input validation, and sanitization. However, it has medium-severity issues including weak email validation regex, incomplete XSS sanitization, and non-cryptographic ID generation. The code also has maintainability concerns with commented-out database logic and missing error handling. While the overall structure is clean, production-readiness would require addressing the security and maintainability gaps. The code follows TypeScript best practices with proper typing and interface definitions."
+      },
+      "testCoverage": {
+        "file": "fixtures/clean-code.ts",
+        "hasTests": false,
+        "testFiles": [],
+        "untestedPaths": [
+          {
+            "type": "function",
+            "location": "fixtures/clean-code.ts:19-22",
+            "priority": "critical",
+            "reasoning": "Email validation is security-critical. Invalid email formats could allow malformed data into the system. The regex pattern needs validation for common email formats, edge cases, and potential bypass attempts.",
+            "suggestedTest": "Test isValidEmail() with valid emails (standard format, subdomains, plus addressing), invalid emails (missing @, missing domain, spaces, special chars), and edge cases (empty string, very long emails, unicode characters)."
+          },
+          {
+            "type": "function",
+            "location": "fixtures/clean-code.ts:27-33",
+            "priority": "critical",
+            "reasoning": "Input sanitization prevents XSS attacks. Incomplete sanitization could allow script injection. All XSS vectors must be tested to ensure security.",
+            "suggestedTest": "Test sanitizeInput() with clean strings, XSS payloads (<script>, <img onerror>), all special characters being escaped (<>\"'), nested/encoded payloads, and edge cases (empty string, very long input)."
+          },
+          {
+            "type": "branch",
+            "location": "fixtures/clean-code.ts:40-42",
+            "priority": "high",
+            "reasoning": "Missing required fields should throw errors. This validation prevents incomplete user records from being created.",
+            "suggestedTest": "Test createUser() throws 'Email and name are required' when email is missing, when name is missing, when both are missing, when email is empty string, and when name is empty string."
+          },
+          {
+            "type": "branch",
+            "location": "fixtures/clean-code.ts:44-46",
+            "priority": "high",
+            "reasoning": "Invalid email format should be rejected before database operations. This prevents data integrity issues and potential security problems.",
+            "suggestedTest": "Test createUser() throws 'Invalid email format' when provided with various invalid email formats (no @, no domain, malformed)."
+          },
+          {
+            "type": "function",
+            "location": "fixtures/clean-code.ts:38-60",
+            "priority": "high",
+            "reasoning": "The main user creation function orchestrates validation, sanitization, and persistence. Success path must be verified to ensure correct behavior.",
+            "suggestedTest": "Test createUser() successfully creates a user with valid input, verifies email is lowercased, name is sanitized, ID is generated with correct format, createdAt is set, and saveUser is called."
+          },
+          {
+            "type": "function",
+            "location": "fixtures/clean-code.ts:65-67",
+            "priority": "medium",
+            "reasoning": "ID generation must produce unique, correctly formatted IDs to prevent collisions and ensure data integrity.",
+            "suggestedTest": "Test generateId() returns string starting with 'user_', contains timestamp, includes random component, generates unique IDs on multiple calls, and matches expected format pattern."
+          },
+          {
+            "type": "function",
+            "location": "fixtures/clean-code.ts:72-79",
+            "priority": "medium",
+            "reasoning": "Database persistence is critical for user creation. Both success and failure paths should be tested to ensure proper error handling.",
+            "suggestedTest": "Test saveUser() is called with correct parameters (id, email, name, createdAt) in the correct order matching the parameterized query. Mock database to verify SQL injection protection."
+          },
+          {
+            "type": "edge-case",
+            "location": "fixtures/clean-code.ts:20",
+            "priority": "medium",
+            "reasoning": "Email regex may have edge cases that bypass validation, allowing invalid formats through.",
+            "suggestedTest": "Test isValidEmail() with edge cases: multiple @ symbols, consecutive dots, leading/trailing dots in domain, international domains, quoted strings, IP address formats, very long local/domain parts."
+          },
+          {
+            "type": "edge-case",
+            "location": "fixtures/clean-code.ts:51",
+            "priority": "medium",
+            "reasoning": "Email lowercasing should handle all character sets correctly to prevent duplicate accounts with different casing.",
+            "suggestedTest": "Test createUser() lowercases email correctly with uppercase, mixed case, and already lowercase emails. Verify non-ASCII characters are handled properly."
+          },
+          {
+            "type": "edge-case",
+            "location": "fixtures/clean-code.ts:28-32",
+            "priority": "medium",
+            "reasoning": "Sanitization must handle all possible XSS vectors including complex nested attacks and encoded characters.",
+            "suggestedTest": "Test sanitizeInput() with double-encoded XSS payloads, mixed case tags, unicode lookalikes, zero-width characters, and various encoding schemes (URL, HTML entities)."
+          },
+          {
+            "type": "edge-case",
+            "location": "fixtures/clean-code.ts:49",
+            "priority": "low",
+            "reasoning": "Name sanitization may need to handle very long inputs that could cause performance or storage issues.",
+            "suggestedTest": "Test createUser() with extremely long name (10KB+, 1MB+) to verify sanitization performance and ensure no crashes or hangs."
+          },
+          {
+            "type": "edge-case",
+            "location": "fixtures/clean-code.ts:40-42",
+            "priority": "low",
+            "reasoning": "Input validation should handle various falsy values consistently.",
+            "suggestedTest": "Test createUser() with null, undefined, whitespace-only strings, and other falsy values for email and name fields."
+          },
+          {
+            "type": "branch",
+            "location": "fixtures/clean-code.ts:56",
+            "priority": "medium",
+            "reasoning": "Database save operation could fail, but error handling is not visible in the code. Async errors should propagate correctly.",
+            "suggestedTest": "Test createUser() propagates errors when saveUser() rejects/throws (database connection failure, constraint violation, timeout)."
+          },
+          {
+            "type": "edge-case",
+            "location": "fixtures/clean-code.ts:66",
+            "priority": "low",
+            "reasoning": "ID generation uses Math.random() which could theoretically produce collisions, though unlikely.",
+            "suggestedTest": "Test generateId() produces unique IDs in rapid succession (1000+ calls) to verify collision resistance."
+          },
+          {
+            "type": "edge-case",
+            "location": "fixtures/clean-code.ts:53",
+            "priority": "low",
+            "reasoning": "Date.now() in createdAt could have timing edge cases in rapid user creation.",
+            "suggestedTest": "Test createUser() sets createdAt timestamp correctly and handles rapid sequential calls."
+          }
+        ],
+        "coverageEstimate": 0,
+        "summary": "No tests exist for this file. Critical security functions (email validation, XSS sanitization, input validation) are completely untested. The main createUser() function and all its branches lack coverage. Both happy path and error paths need comprehensive testing. This represents a significant security and reliability risk."
+      },
+      "refactorings": {
+        "file": "fixtures/clean-code.ts",
+        "suggestions": [
+          {
+            "type": "modernize",
+            "location": "lines 36-37 (sanitizeInput function)",
+            "impact": "low",
+            "description": "Use regex with global flag instead of chaining multiple replace calls for better performance and readability",
+            "before": "return input\n  .replace(/</g, '&lt;')\n  .replace(/>/g, '&gt;')\n  .replace(/\"/g, '&quot;')\n  .replace(/'/g, '&#039;');",
+            "after": "const htmlEscapeMap: Record<string, string> = {\n  '<': '&lt;',\n  '>': '&gt;',\n  '\"': '&quot;',\n  \"'\": '&#039;'\n};\nreturn input.replace(/[<>\"']/g, char => htmlEscapeMap[char]);",
+            "benefits": "Single pass through the string instead of four passes, more maintainable with centralized escape mapping, easier to extend with additional characters, and improves performance for large strings"
+          },
+          {
+            "type": "pattern-improvement",
+            "location": "lines 46-49 (createUser validation)",
+            "impact": "medium",
+            "description": "Extract validation logic into a separate validator function for better testability and reusability",
+            "before": "if (!input.email || !input.name) {\n  throw new Error('Email and name are required');\n}\n\nif (!isValidEmail(input.email)) {\n  throw new Error('Invalid email format');\n}",
+            "after": "function validateUserInput(input: CreateUserInput): void {\n  const errors: string[] = [];\n  \n  if (!input.email || !input.name) {\n    errors.push('Email and name are required');\n  }\n  \n  if (input.email && !isValidEmail(input.email)) {\n    errors.push('Invalid email format');\n  }\n  \n  if (errors.length > 0) {\n    throw new Error(errors.join('; '));\n  }\n}\n\n// In createUser:\nvalidateUserInput(input);",
+            "benefits": "Better separation of concerns, easier to test validation logic independently, enables collecting multiple validation errors at once for better UX, and makes validation rules reusable across the codebase"
+          },
+          {
+            "type": "pattern-improvement",
+            "location": "lines 72-73 (generateId function)",
+            "impact": "medium",
+            "description": "Use crypto.randomUUID() for more secure and collision-resistant ID generation",
+            "before": "function generateId(): string {\n  return `user_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;\n}",
+            "after": "import { randomUUID } from 'crypto';\n\nfunction generateId(): string {\n  return `user_${randomUUID()}`;\n}",
+            "benefits": "Cryptographically secure random IDs, RFC 4122 compliant UUIDs, better collision resistance, no reliance on timestamp which can cause issues with concurrent requests, and follows industry best practices for ID generation"
+          },
+          {
+            "type": "modernize",
+            "location": "lines 28-30 (isValidEmail function)",
+            "impact": "low",
+            "description": "Add more comprehensive email validation or use a dedicated library for production use",
+            "before": "export function isValidEmail(email: string): boolean {\n  const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n  return emailRegex.test(email);\n}",
+            "after": "export function isValidEmail(email: string): boolean {\n  // More comprehensive regex that handles edge cases\n  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;\n  return emailRegex.test(email) && email.length <= 254;\n}\n\n// OR for production:\n// import validator from 'validator';\n// export function isValidEmail(email: string): boolean {\n//   return validator.isEmail(email);\n// }",
+            "benefits": "Better validation coverage following RFC 5322 standards, length validation to prevent buffer issues, handles more edge cases like consecutive dots and special characters, or using a battle-tested library reduces maintenance burden"
+          },
+          {
+            "type": "pattern-improvement",
+            "location": "lines 44-65 (createUser function)",
+            "impact": "low",
+            "description": "Extract user object creation into a factory function for better testability",
+            "before": "// Create user object\nconst user: User = {\n  id: generateId(),\n  email: input.email.toLowerCase(),\n  name: sanitizedName,\n  createdAt: new Date()\n};\n\n// Save to database (using parameterized query)\nawait saveUser(user);\n\nreturn user;",
+            "after": "function buildUser(input: CreateUserInput, sanitizedName: string): User {\n  return {\n    id: generateId(),\n    email: input.email.toLowerCase(),\n    name: sanitizedName,\n    createdAt: new Date()\n  };\n}\n\n// In createUser:\nconst user = buildUser(input, sanitizedName);\nawait saveUser(user);\nreturn user;",
+            "benefits": "Easier to test user object creation in isolation, allows mocking of ID and date generation, cleaner separation between business logic and persistence, and makes the createUser function more focused on orchestration"
+          },
+          {
+            "type": "modernize",
+            "location": "lines 80-83 (saveUser function)",
+            "impact": "low",
+            "description": "Add proper error handling and return type documentation for database operations",
+            "before": "async function saveUser(user: User): Promise<void> {\n  // Using parameterized query - safe from SQL injection\n  const query = 'INSERT INTO users (id, email, name, created_at) VALUES ($1, $2, $3, $4)';\n  const params = [user.id, user.email, user.name, user.createdAt];\n  \n  // await db.query(query, params);\n}",
+            "after": "async function saveUser(user: User): Promise<void> {\n  try {\n    // Using parameterized query - safe from SQL injection\n    const query = 'INSERT INTO users (id, email, name, created_at) VALUES ($1, $2, $3, $4)';\n    const params = [user.id, user.email, user.name, user.createdAt];\n    \n    // await db.query(query, params);\n  } catch (error) {\n    throw new Error(`Failed to save user: ${error instanceof Error ? error.message : 'Unknown error'}`);\n  }\n}",
+            "benefits": "Better error context for debugging, wraps database errors with domain-specific messages, makes error handling explicit, and improves observability in production environments"
+          },
+          {
+            "type": "pattern-improvement",
+            "location": "lines 44-65 (createUser function overall structure)",
+            "impact": "low",
+            "description": "Consider adding transaction support or idempotency checks for production use",
+            "before": "export async function createUser(input: CreateUserInput): Promise<User> {\n  // Validate input\n  // ...\n  // Create user object\n  // ...\n  // Save to database\n  await saveUser(user);\n  return user;\n}",
+            "after": "export async function createUser(input: CreateUserInput, options?: { idempotencyKey?: string }): Promise<User> {\n  // Check for duplicate email before creating\n  const existingUser = await findUserByEmail(input.email.toLowerCase());\n  if (existingUser) {\n    throw new Error('User with this email already exists');\n  }\n  \n  // Validate input\n  // ...\n  // Create user object\n  // ...\n  // Save to database\n  await saveUser(user);\n  return user;\n}",
+            "benefits": "Prevents duplicate user creation, adds idempotency for distributed systems, improves data integrity, and provides better error messages for duplicate scenarios"
+          }
+        ],
+        "summary": "The code is well-structured and follows good practices with input validation, sanitization, and parameterized queries. Identified 7 refactoring opportunities with low to medium impact: modernizing ID generation with crypto.randomUUID(), improving sanitization with a single-pass approach, extracting validation logic for better testability, enhancing email validation, creating factory functions for better separation of concerns, adding explicit error handling, and considering duplicate prevention. These improvements focus on security, performance, maintainability, and production-readiness without changing core functionality."
+      }
+    }
+  ],
+  "summary": {
+    "totalFiles": 1,
+    "overallScore": 72,
+    "criticalIssues": 0,
+    "highPriorityTests": 5,
+    "refactoringOpportunities": 7
+  },
+  "recommendations": [
+    {
+      "priority": "critical",
+      "category": "Testing",
+      "description": "Add comprehensive test coverage for security-critical functions. The file has 0% test coverage with critical security functions (email validation, XSS sanitization) completely untested.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "Security",
+      "description": "Replace weak email validation regex with a robust library like validator.js or implement RFC 5322 compliant validation to prevent invalid email formats from being accepted.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "Security",
+      "description": "Replace basic HTML entity sanitization with a dedicated library like DOMPurify or xss to handle all XSS attack vectors including JavaScript event handlers and unicode bypasses.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Security",
+      "description": "Replace Math.random() based ID generation with crypto.randomUUID() for cryptographically secure, collision-resistant IDs that follow RFC 4122 standards.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Maintainability",
+      "description": "Implement actual database logic with proper error handling, connection management, and retry logic, or clearly mark the commented-out code as a stub/mock for testing purposes.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Code Quality",
+      "description": "Normalize email (lowercase and trim) before validation to prevent edge cases with unicode or internationalized domain names from bypassing validation.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Refactoring",
+      "description": "Extract validation logic into a separate validator function to improve testability, enable collecting multiple validation errors at once, and make validation rules reusable.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "low",
+      "category": "Code Quality",
+      "description": "Add error handling for database operations to provide better context when failures occur and improve observability in production environments.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    }
+  ],
+  "metadata": {
+    "analyzedAt": "2026-10-14T00:00:00.000Z",
+    "duration": 0,
+    "agentVersions": {
+      "code-quality-analyzer": "af5e24d",
+      "test-coverage-analyzer": "a4c1579",
+      "refactoring-suggester": "a97e566"
+    }
+  }
+}
