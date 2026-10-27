@@ -1,53 +1,39 @@
-import { describe, it } from 'vitest';
-
+import { describe, it } from "vitest";
 
 /**
  * Tests for CodeReviewOrchestrator
  *
- * TODO: Implement these tests
+ * Unit coverage for the orchestrator requires mocking the
+ * Claude Agent SDK and MCP interactions.
  *
- * Tips:
- * - Use vitest mocking for MCP servers
- * - Mock rate limiter to avoid delays
- * - Test both success and failure paths
+ * The real PR integration scenario is retained as a skipped
+ * manual test because it requires valid API credentials.
  */
 
-describe('CodeReviewOrchestrator', () => {
-  describe('Configuration', () => {
-    it('should initialize with default options', () => {
-    });
+describe("CodeReviewOrchestrator", () => {
+  describe("Configuration", () => {
+    it.todo("should initialize with default options");
 
-    it('should accept custom rate limit configuration', () => {
-      // TODO: Create orchestrator with custom rate limits
-      // TODO: Verify custom limits are applied
-    });
+    it.todo("should accept custom configuration");
   });
 
-  describe('reviewPullRequest', () => {
-    it('should fetch PR files from GitHub MCP', async () => {
-     
-    });
+  describe("reviewPullRequest", () => {
+    it.todo("should fetch PR files from GitHub MCP");
 
-    it('should spawn all 3 subagents in parallel', async () => {
-  
-    });
+    it.todo("should spawn all 3 subagents");
 
-    it('should aggregate results into ReviewReport', async () => {
-  
-    });
+    it.todo("should aggregate results into ReviewReport");
 
-    it('should validate output with Zod schema', async () => {
-    });
-
- 
+    it.todo("should validate output with Zod schema");
   });
 
-
-  describe('Integration', () => {
-    // These tests require actual API keys and should be skipped in CI
-    it.skip('should review a real small PR', async () => {
-      // TODO: Test with a real public PR
-      // NOTE: Only run manually with valid API keys
+  describe("Integration", () => {
+    // Manual integration scenario requiring valid API credentials.
+    it.skip("should review a real small PR", async () => {
+      // Example integration target:
+      // owner: octocat
+      // repo: Hello-World
+      // PR: 1
     });
   });
 });

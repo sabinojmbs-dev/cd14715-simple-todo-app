@@ -90,9 +90,15 @@ export async function withRetry<T>(
    }
 
   throw new ReviewError(
-    ErrorCodes.RETRY_EXHAUSTED,
     `Operation failed after ${maxRetries} attempts`,
-    lastError);
+    ErrorCodes.RETRY_EXHAUSTED,
+    {
+      cause:
+        lastError instanceof Error
+          ? lastError.message
+          : String(lastError),
+    }
+  );
 }
 
 /**
@@ -116,8 +122,8 @@ export async function withTimeout<T>(
     setTimeout(() => {
       reject(
         new ReviewError(
-          ErrorCodes.AGENT_TIMEOUT,
           errorMessage,
+          ErrorCodes.AGENT_TIMEOUT,
           { timeoutMs }
         )
       );

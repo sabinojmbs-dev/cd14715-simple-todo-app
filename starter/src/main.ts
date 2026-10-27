@@ -15,7 +15,6 @@ dotenv.config();
  */
 async function main() {
   const [owner, repo, prStr] = process.argv.slice(2);
-  console.log('start here', owner, repo, prStr);
 
   // Validate command-line arguments
   if (!owner || !repo || !prStr) {
@@ -78,7 +77,7 @@ async function main() {
 
 
   try {
-    console.log('Reviewing pull request ${owner}/${repo} #${prNumber}');
+    console.log(`Reviewing pull request ${owner}/${repo} #${prNumber}`);
     const orchestrator = new CodeReviewOrchestrator({
       model: process.env.ANTHROPIC_MODEL,
     });
@@ -138,8 +137,8 @@ async function main() {
   }
 }
 
-main();
-
-const orchestrator = new CodeReviewOrchestrator();
-const result = await orchestrator.reviewPullRequest('octocat', 'Hello-World', 1);
-console.log(JSON.stringify(result, null, 2));
+main().catch((error) => {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`Review failed: ${message}`);
+  process.exitCode = 1;
+});

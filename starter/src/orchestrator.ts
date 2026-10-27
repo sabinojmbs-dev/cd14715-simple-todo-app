@@ -106,12 +106,13 @@ export class CodeReviewOrchestrator {
           "Task",
           "mcp__github__get_pull_request",
           "mcp__github__get_pull_request_files",
+          "mcp__eslint__*",
         ],
 
         model: this.model,
         maxTurns: this.maxTurns,
 
-        permissionMode: "bypassPermissions",
+        permissionMode: 'default',
 
         outputFormat: {
           type: "json_schema",
